@@ -28,7 +28,9 @@ function Chat({ user }) {
     if (messages) {
       setLoading(false);
     }
-  });
+   
+    
+  },[]);
   const handleMessage = async (text) => {
     if (!text.trim()) {
       toast.error("Empty Messages Not Allowed!!");
@@ -41,14 +43,14 @@ function Chat({ user }) {
       send_by: user?.user.id,
       is_edit: false,
       created_at: new Date().toISOString(),
-      user: {
-        id: user?.user.id,
-        created_at: user?.user.created_at,
-        email: user?.user.email,
-      },
+      // user: {
+      //   id: user?.user.id,
+      //   created_at: user?.user.created_at,
+      //   email: user?.user.email,
+      // },
     };
 
-    const { data, error } = await supabase.from("messages").insert({ text });
+    const { data, error } = await supabase.from("messages").insert(newMessage);
 
     if (error) {
       toast.error(error.message);
@@ -56,6 +58,9 @@ function Chat({ user }) {
       toast.success("Message sent!");
     }
   };
+  
+
+  
   const onDelete = (id) => {
     setMessages((prev) => prev.filter((sm) => sm.id !== id));
   };
@@ -127,7 +132,8 @@ function Chat({ user }) {
           </div>
 
           <div className="p-4">
-            <ChatInput handleMessage={handleMessage} />
+            <ChatInput  messages={messages}
+                setMessages={setMessages} handleMessage={handleMessage} />
           </div>
         </div>
       ) : (

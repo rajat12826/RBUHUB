@@ -4,7 +4,7 @@ import ChatCard from "./ChatCard";
 import Loader from "./Loader";
 import MessageLoad from "./MessageLoad";
 
-function ListMessages({ setcurrentU,setOnlineUserCount, addMessage, messages, setMessages, user, open, setOpen, onDelete, handleDelete }) {
+function ListMessages({ setcurrentU, setOnlineUserCount, addMessage, messages, setMessages, user, open, setOpen, onDelete, handleDelete }) {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null); // Create a ref for the messages container
 
@@ -40,11 +40,12 @@ function ListMessages({ setcurrentU,setOnlineUserCount, addMessage, messages, se
 
     fetchMessages();
 
-    const channel = supabase
+    const channel =  supabase
       .channel("public:messages")
       .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, async (payload) => {
         if (payload.eventType === "INSERT") {
           const newMessage = payload.new;
+          console.log("New message inserted:", newMessage);
           const { data: user, error: userError } = await supabase
             .from("User")
             .select("*")
@@ -59,6 +60,8 @@ function ListMessages({ setcurrentU,setOnlineUserCount, addMessage, messages, se
           setMessages((prevMessages) => [...prevMessages, messageWithUser]);
         } else if (payload.eventType === "UPDATE") {
           const updatedMessage = payload.new;
+          console.log("Message updated:", updatedMessage);
+
           const { data: user, error: userError } = await supabase
             .from("User")
             .select("*")
@@ -82,9 +85,10 @@ function ListMessages({ setcurrentU,setOnlineUserCount, addMessage, messages, se
       .subscribe();
 
     return () => {
+      console.log("Removing channel subscription...");
       supabase.removeChannel(channel);
     };
-  }, [messages]);
+  }, []); // No need to depend on messages here
 
   useEffect(() => {
     const fetchOnlineUserCount = async () => {
@@ -92,19 +96,17 @@ function ListMessages({ setcurrentU,setOnlineUserCount, addMessage, messages, se
         .from("online_users")
         .select('*', { count: 'exact' })  
         .eq('status', 'online'); 
-console.log("fetch",data)
-setcurrentU(data)
-console.log(data)
 
+      setcurrentU(data);
+      
       if (error) {
         console.error("Error fetching online user count:", error.message);
       } else {
-        console.log("count", count);
         setOnlineUserCount(count);
       }
     };
 
-    fetchOnlineUserCount()
+    fetchOnlineUserCount();
 
     const channel = supabase
       .channel('public:online_users')
@@ -116,14 +118,14 @@ console.log(data)
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [messages]);
+  }, []);
 
+  // Scroll to bottom whenever messages change
   useEffect(() => {
-    // Scroll to the bottom of the messages
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]); // Runs when messages change
+  }, [messages]);
 
   return (
     <>

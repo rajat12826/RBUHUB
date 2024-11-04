@@ -1,16 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
-function ChatInput({ handleMessage }) {
+import supabase from "../config/supabaseClients";
+function ChatInput({ handleMessage,messages,setMessages }) {
+const[m,setM]=useState("")
   return (
     <>
       <div className="relative w-full">
         <input
+        value={m}
           type="text"
+          onChange={(e)=>(setM(e.target.value))}
           onKeyDown={(e) => {
             if (e.key == "Enter") {
               handleMessage(e.currentTarget.value);
               e.currentTarget.value = "";
+              setM("")
             }
           }}
           placeholder="Enter the text"
@@ -20,10 +25,12 @@ function ChatInput({ handleMessage }) {
         <button
           type="submit"
           onClick={(e) => {
-            if (e.key == "Enter") {
-              handleMessage(e.currentTarget.value);
-              e.currentTarget.value = "";
-            }
+            // if (e.key == "Enter") {
+            console.log(m);
+            e.currentTarget.value = "";
+              handleMessage(m);
+              setM("")
+            // }
           }}
           class="absolute top-0 end-0 p-2.5 h-full text-sm font-medium text-white       "
         >

@@ -15,11 +15,13 @@ import { Toaster } from "react-hot-toast";
 import Modal from "./Modal";
 
 function ChatCard({ addMessage,allMessage,messages,message, setMessages,sender, sendAt, user, id,open,setOpen}) {
-  console.log(allMessage);
-  console.log();
+  // console.log(allMessage);
+ 
   
   const [up,setUp]=useState(id === user?.user.id)
   let u=JSON.parse(localStorage.getItem('user'))
+;
+  
  const [update, setUpdate] = useState(false); 
  const [upmess,setupmess]=useState(message)
 useEffect(()=>{
@@ -42,10 +44,14 @@ useEffect(()=>{
   const handleOpen = () => setOpen(!open);
   let id1=id
   const deleteFn=()=>{
+    console.log(id1)
+    console.log(messages);
     const onDelete = (id) => {
       setMessages((prev) => prev.filter((sm) => sm.id !== id));
     };
     const handleDelete = async (id) => {
+      console.log(id1,u.user.id);
+      
       if(id1 === u?.user.id){
       const { data, error } = await supabase
         .from("messages")
