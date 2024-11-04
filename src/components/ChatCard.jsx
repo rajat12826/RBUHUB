@@ -227,38 +227,38 @@ useEffect(()=>{
           </div>
         </Modal>
         <Modal open={update} onClose={() => setUpdate(false)}>
-          <div className="text-center w-56">
-          
-            <div className="mx-auto my-4 w-48">
-              <h3 className="text-lg font-black text-gray-800">
-                Confirm Edit
-              </h3>
-              <p className="text-sm text-gray-500">
-                Are you sure you want to update this item?
-              </p>
-            </div>
-            <div className="pb-2 w-52 ">
-            <textarea value={upmess} type="text " className="border-2  " onChange={(e)=>setupmess(e.target.value)}/>
-            </div>
-          
-            <div className="flex gap-4">
-              <button
-                className="btn btn-danger w-full bg-green-500  text-white py-1 rounded-sm hover:bg-transparent hover:text-green-500 hover:font-semibold"
-                onClick={updateFn }
-              >
-               Update
-              </button>
-              <button
-                className="btn btn-light w-full text-green-500 font-semibold hover:bg-green-100 hover:rounded-sm"
-                onClick={() => {setUpdate(false)
-                  setupmess(message)
-                } }
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </Modal>
+  <div className="bg-white text-center w-72 mx-auto p-6 rounded-lg shadow-md">
+    <h3 className="text-lg font-black text-gray-800 mb-4">Confirm Edit</h3>
+    <p className="text-sm text-gray-500 mb-4">Are you sure you want to update this item?</p>
+    <div className="pb-2 w-full">
+      <textarea
+        value={upmess}
+        className="border-2 border-gray-300 w-full p-2 rounded-md resize-none"
+        onChange={(e) => setupmess(e.target.value)}
+        rows={4} // Adjust rows as needed
+      />
+    </div>
+    <div className="flex gap-4 mt-4">
+      <button
+        className="w-full bg-green-500 text-white py-2 rounded-sm hover:bg-green-600 transition duration-200"
+        onClick={updateFn}
+      >
+        Update
+      </button>
+      <button
+        className="w-full text-green-500 font-semibold hover:bg-green-100 py-2 rounded-sm transition duration-200"
+        onClick={() => {
+          setUpdate(false);
+          setupmess(message);
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</Modal>
+
+
       </div>
 <Toaster/>
       
