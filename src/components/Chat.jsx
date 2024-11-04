@@ -87,7 +87,7 @@ function Chat({ user }) {
 
                   <Menu>
                     <MenuHandler>
-                      <Button>
+                      <Button className="bg-[#100f18]">
                         <h1 className=" text-sm text-gray-500">
                           {onlineUserCount} online
                         </h1>
