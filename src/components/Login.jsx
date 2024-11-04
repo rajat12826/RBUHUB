@@ -93,7 +93,7 @@ function Login({ setL, loading, setLoading }) {
 
   return (
     <>
-      <div className="flex justify-center py-5"></div>
+      <div className="flex justify-center "></div>
       {!loading ? (
         <div className="flex justify-center  w-full">
           <section className="grid text-center h-screen items-center p-8">
