@@ -142,7 +142,7 @@ useEffect(()=>{
             <h1 className="text-white font-semibold text-sm">
               {sender?.substring(0, 15)}
             </h1>
-            <h1 className="text-zinc-400 pl-2">
+            <h1 className="text-zinc-400 pl-2 max-sm:text-sm ">
               {date.toLocaleString("en-IN", options)}
             </h1>
             {up ? (
@@ -237,8 +237,8 @@ useEffect(()=>{
                 Are you sure you want to update this item?
               </p>
             </div>
-            <div className="pb-2">
-            <textarea value={upmess} type="text " className="border-2 " onChange={(e)=>setupmess(e.target.value)}/>
+            <div className="pb-2 max-w-56 ">
+            <textarea value={upmess} type="text " className="border-2  " onChange={(e)=>setupmess(e.target.value)}/>
             </div>
           
             <div className="flex gap-4">
