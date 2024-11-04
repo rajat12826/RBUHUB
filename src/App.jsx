@@ -8,7 +8,8 @@ import SignUp from "./components/SignUp";
 import Chat from "./components/Chat";
 
 import { Toaster } from "react-hot-toast";
-import Navbar from "./Navbar";
+import Navbar from "./components/Navbar";
+
 
 function App() {
   const [user, setUser] = useState(() => {

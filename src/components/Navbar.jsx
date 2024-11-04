@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import supabase from "./config/supabaseClients";
+import supabase from "../config/supabaseClients";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
 function Navbar() {
