@@ -6,8 +6,9 @@ import Update from "./pages/Update";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import Chat from "./components/Chat";
-import NavBar from "./Navbar";
+
 import { Toaster } from "react-hot-toast";
+import Navbar from "./Navbar";
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -27,7 +28,7 @@ function App() {
     <>
       <div className="h-screen">
         <BrowserRouter>
-          <NavBar />
+          <Navbar/>
           <Routes>
             <Route path="/" element={<Home user={user} loading={loading} setLoading={setLoading} />} />
             <Route path="/create" element={<Create user={user} loading={loading} setLoading={setLoading} />} />

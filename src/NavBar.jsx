@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import supabase from "./config/supabaseClients";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
-function NavBar() {
+function Navbar() {
   const navigate = useNavigate();
   useEffect(() => {
     setTimeout(async () => {
@@ -72,4 +72,4 @@ function NavBar() {
   );
 }
 
-export default NavBar;
+export default Navbar;
