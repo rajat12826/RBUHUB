@@ -125,7 +125,7 @@ function Login({ setL, loading, setLoading }) {
                     type="email"
                     name="email"
                     placeholder="name@mail.com"
-                    className="w-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray p-2 my-2"
+                    className="w-full placeholder:opacity-100 focus:border-primary border-blue-gray-200 p-2 my-2"
                     labelProps={{
                       className: "hidden",
                     }}
@@ -148,7 +148,7 @@ function Login({ setL, loading, setLoading }) {
                       labelProps={{
                         className: "hidden",
                       }}
-                      className="w-full my-2 h-full placeholder:opacity-100 focus:border-t-primary border-t-blue-gray-200 p-2 pr-10" // Add right padding for the icon
+                      className="w-full my-2 h-full placeholder:opacity-100 focus:border-primary border-blue-gray-200 p-2 pr-10" // Add right padding for the icon
                       type={passwordShown ? "text" : "password"}
                       onChange={(e) => setPassword(e.target.value)}
                     />
