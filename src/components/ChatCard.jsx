@@ -237,7 +237,7 @@ useEffect(()=>{
                 Are you sure you want to update this item?
               </p>
             </div>
-            <div className="pb-2 max-w-56 ">
+            <div className="pb-2 w-52 ">
             <textarea value={upmess} type="text " className="border-2  " onChange={(e)=>setupmess(e.target.value)}/>
             </div>
           
