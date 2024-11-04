@@ -84,7 +84,7 @@ function ListMessages({ setcurrentU,setOnlineUserCount, addMessage, messages, se
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [messages]);
 
   useEffect(() => {
     const fetchOnlineUserCount = async () => {
@@ -94,7 +94,7 @@ function ListMessages({ setcurrentU,setOnlineUserCount, addMessage, messages, se
         .eq('status', 'online'); 
 console.log("fetch",data)
 setcurrentU(data)
-console.log(data);
+console.log(data)
 
       if (error) {
         console.error("Error fetching online user count:", error.message);
@@ -104,7 +104,7 @@ console.log(data);
       }
     };
 
-    fetchOnlineUserCount();
+    fetchOnlineUserCount()
 
     const channel = supabase
       .channel('public:online_users')
@@ -116,7 +116,7 @@ console.log(data);
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [messages]);
 
   useEffect(() => {
     // Scroll to the bottom of the messages

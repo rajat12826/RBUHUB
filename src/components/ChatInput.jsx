@@ -19,6 +19,12 @@ function ChatInput({ handleMessage }) {
         ></input>
         <button
           type="submit"
+          onClick={(e) => {
+            if (e.key == "Enter") {
+              handleMessage(e.currentTarget.value);
+              e.currentTarget.value = "";
+            }
+          }}
           class="absolute top-0 end-0 p-2.5 h-full text-sm font-medium text-white       "
         >
           <svg
