@@ -125,7 +125,7 @@ function Login({ setL, loading, setLoading }) {
                     type="email"
                     name="email"
                     placeholder="name@mail.com"
-                    className="w-full placeholder:opacity-100 focus:border-primary border-blue-gray-200 p-2 my-2"
+                    className="w-full placeholder:opacity-100 border-2 p-2 my-2"
                     labelProps={{
                       className: "hidden",
                     }}
