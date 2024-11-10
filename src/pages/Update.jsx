@@ -23,7 +23,7 @@ const Update = () => {
     }
     const { data, error } = await supabase
       .from("notes")
-      .update({ subject:sub,note })
+      .update({ subject: sub, note })
       .eq("id", id)
       .select();
 
@@ -77,7 +77,7 @@ const Update = () => {
           >
             <div className="py-2 ">
               <label className="flex ">
-               Subject:
+                Subject:
                 <input
                   type="text"
                   className="ml-10  border-2  rounded-sm  "

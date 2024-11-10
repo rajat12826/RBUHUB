@@ -10,7 +10,6 @@ import Chat from "./components/Chat";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 
-
 function App() {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
@@ -21,21 +20,34 @@ function App() {
   useEffect(() => {
     console.log(user);
     console.log(l);
-   
-    
   }, [user]);
 
   return (
     <>
       <div className="h-screen">
         <BrowserRouter>
-          <Navbar/>
+          <Navbar />
           <Routes>
-            <Route path="/" element={<Home user={user} loading={loading} setLoading={setLoading} />} />
-            <Route path="/create" element={<Create user={user} loading={loading} setLoading={setLoading} />} />
+            <Route
+              path="/"
+              element={
+                <Home user={user} loading={loading} setLoading={setLoading} />
+              }
+            />
+            <Route
+              path="/create"
+              element={
+                <Create user={user} loading={loading} setLoading={setLoading} />
+              }
+            />
             <Route path="/:id" element={<Update user={user} />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<Login loading={loading} setLoading={setLoading} setL={setL} />} />
+            <Route
+              path="/login"
+              element={
+                <Login loading={loading} setLoading={setLoading} setL={setL} />
+              }
+            />
             <Route path="/chat" element={<Chat user={user} />} />
           </Routes>
         </BrowserRouter>

@@ -17,39 +17,151 @@ import {
 function Chat({ user }) {
   const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [messages, setMessages] = useState([]);
-  console.log(user?.user);
+  console.log(user?.user, "d");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentU, setcurrentU] = useState([]);
-  
+  const [typingStatus, setTypingStatus] = useState({});
   console.log(currentU);
+  console.log(typingStatus);
+  const [us, setUs] = useState("");
+  useEffect(() => {
+    const typingChannel = supabase
+      .channel("public:typing_status")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "typing_status" },
+        async (payload) => {
+          const { new: newTypingStatus, old: oldTypingStatus } = payload;
+
+          console.log("Payload received:", payload);
+
+          if (payload.eventType === "INSERT" && payload.new.username) {
+            const username = payload.new.username;
+            if (payload.new.typing) {
+              console.log(`${username} is typing`);
+              setTypingStatus((prev) => ({
+                ...prev,
+                [payload.new.id]: username,
+              }));
+            }
+          }
+
+          if (payload.eventType === "DELETE" && payload.old) {
+            // const userId = payload.old.user;
+
+            // const { data: userData, error: userError } = await supabase
+            //   .from("User")
+            //   .select("username")
+            //   .eq("user_id", userId)
+            //   .single();
+
+            // if (userError) {
+            //   console.error("Error fetching user data for DELETE event:", userError);
+            //   return;
+            // }
+
+            // if (userData?.username) {
+            // console.log(`${userData.username} stopped typing`);
+            setTypingStatus((prev) => {
+              const newState = { ...prev };
+              delete newState[payload.old.id];
+              return newState;
+            });
+            // }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(typingChannel);
+    };
+  }, []);
+
+  // useEffect(async() => {
+
+  //   const { data: userData, error: userError } =  await supabase
+  //   .from("User")
+  //   .select("username")
+  //   .eq("user_id", user?.user.id)
+  //   .single();
+  //   setTimeout(async () => {
+  //     // await supabase.from("typing_status").delete().eq("user", user.user.id);
+  //     setTypingStatus((prev) => {
+  //       const updatedStatus = { ...prev };
+  //       if(updatedStatus[userData.username]){
+  //       delete updatedStatus[userData.username];}
+  //       return updatedStatus;
+  //     });
+  //   }, 5000);
+  // }, []);
+  const handleTyping = async () => {
+    const { data: userData, error: userError } = await supabase
+      .from("User")
+      .select("username")
+      .eq("user_id", user?.user.id)
+      .single();
+
+    if (!userData) {
+      console.error("Error: User data not found");
+      return;
+    }
+
+    console.log(userData.username);
+
+    await supabase.from("typing_status").upsert([
+      {
+        user: user.user.id,
+        typing: true,
+        last_updated: new Date(),
+        username: userData.username,
+      },
+    ]);
+
+    setTimeout(async () => {
+      await supabase.from("typing_status").delete().eq("user", user.user.id);
+
+      setTypingStatus((prev) => {
+        const updatedStatus = { ...prev };
+        delete updatedStatus[userData.username];
+        return updatedStatus;
+      });
+    }, 5000);
+  };
 
   useEffect(() => {
     if (messages) {
       setLoading(false);
     }
-   
-    
-  },[]);
+  }, []);
   const handleMessage = async (text) => {
     if (!text.trim()) {
       toast.error("Empty Messages Not Allowed!!");
       return;
     }
+    const { data: userData, error: userError } = await await supabase
+      .from("User")
+      .select("username")
+      .eq("user_id", user?.user.id)
+      .single();
+    console.log(userData);
 
     const newMessage = {
       id: uuidv4(),
       text,
       send_by: user?.user.id,
       is_edit: false,
+      sender_name: userData?.username,
       created_at: new Date().toISOString(),
-      // user: {
-      //   id: user?.user.id,
-      //   created_at: user?.user.created_at,
-      //   email: user?.user.email,
-      // },
+      replyto_id: reply && reply.id ? reply.id : null,
+      reply_to: {
+        username: reply && reply.sender ? reply.sender : null,
+        text: reply && reply.message ? reply.message : null,
+        time: reply && reply.time ? reply.time : null,
+      },
     };
-
+    setReplyM({});
     const { data, error } = await supabase.from("messages").insert(newMessage);
 
     if (error) {
@@ -58,9 +170,7 @@ function Chat({ user }) {
       toast.success("Message sent!");
     }
   };
-  
 
-  
   const onDelete = (id) => {
     setMessages((prev) => prev.filter((sm) => sm.id !== id));
   };
@@ -79,6 +189,7 @@ function Chat({ user }) {
       onDelete(id);
     }
   };
+  const [reply, setReplyM] = useState({});
   return (
     <>
       {!loading ? (
@@ -99,15 +210,24 @@ function Chat({ user }) {
                       </Button>
                     </MenuHandler>
                     <MenuList className="ml-10">
-                      <h1 className="flex justify-center font-bold cursor-default">Online Users</h1>
-                      {
-                        currentU.map((user) => (
-                          <MenuItem key={user.id} className="font-semibold flex  items-center justify-center hover:bg-gray-200 ">
-                            <img src={user.avatar} className="h-8 w-8 items-center "></img>
-                          <h1 className="flex justify-center items-center pl-1">  {user.username}</h1>
-                          </MenuItem>
-                        ))
-                      }
+                      <h1 className="flex justify-center font-bold cursor-default">
+                        Online Users
+                      </h1>
+                      {currentU.map((user) => (
+                        <MenuItem
+                          key={user.id}
+                          className="font-semibold flex  items-center justify-center hover:bg-gray-200 "
+                        >
+                          <img
+                            src={user.avatar}
+                            className="h-8 w-8 items-center "
+                          ></img>
+                          <h1 className="flex justify-center items-center pl-1">
+                            {" "}
+                            {user.username}
+                          </h1>
+                        </MenuItem>
+                      ))}
                     </MenuList>
                   </Menu>
                 </div>
@@ -127,13 +247,23 @@ function Chat({ user }) {
                 addMessage={handleMessage}
                 setOnlineUserCount={setOnlineUserCount}
                 setcurrentU={setcurrentU}
+                reply={reply}
+                setReplyM={setReplyM}
+                typingStatus={typingStatus}
+                setTypingStatus={setTypingStatus}
               />
             </div>
           </div>
 
           <div className="p-4">
-            <ChatInput  messages={messages}
-                setMessages={setMessages} handleMessage={handleMessage} />
+            <ChatInput
+              messages={messages}
+              handleTyping={handleTyping}
+              setMessages={setMessages}
+              handleMessage={handleMessage}
+              reply={reply}
+              setReplyM={setReplyM}
+            />
           </div>
         </div>
       ) : (

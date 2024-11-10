@@ -4,13 +4,32 @@ import ChatCard from "./ChatCard";
 import Loader from "./Loader";
 import MessageLoad from "./MessageLoad";
 
-function ListMessages({ setcurrentU, setOnlineUserCount, addMessage, messages, setMessages, user, open, setOpen, onDelete, handleDelete }) {
+function ListMessages({
+  typingStatus,
+  setTypingStatus,
+  setcurrentU,
+  setOnlineUserCount,
+  addMessage,
+  messages,
+  setMessages,
+  user,
+  open,
+  setOpen,
+  onDelete,
+  handleDelete,
+  reply,
+  setReplyM,
+}) {
   const [loading, setLoading] = useState(true);
-  const messagesEndRef = useRef(null); // Create a ref for the messages container
+  const messagesEndRef = useRef(null);
+  const messageRef = useRef({});
+  // console.log();
 
   useEffect(() => {
     const fetchMessages = async () => {
-      const { data: messages, error } = await supabase.from("messages").select("*");
+      const { data: messages, error } = await supabase
+        .from("messages")
+        .select("*");
 
       if (error) {
         console.error("Error fetching messages:", error.message);
@@ -40,65 +59,77 @@ function ListMessages({ setcurrentU, setOnlineUserCount, addMessage, messages, s
 
     fetchMessages();
 
-    const channel =  supabase
+    const channel = supabase
       .channel("public:messages")
-      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, async (payload) => {
-        if (payload.eventType === "INSERT") {
-          const newMessage = payload.new;
-          console.log("New message inserted:", newMessage);
-          const { data: user, error: userError } = await supabase
-            .from("User")
-            .select("*")
-            .eq("user_id", newMessage.send_by)
-            .single();
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "messages" },
+        async (payload) => {
+          if (payload.eventType === "INSERT") {
+            const newMessage = payload.new;
+            console.log("New message inserted:", newMessage);
+            const { data: user, error: userError } = await supabase
+              .from("User")
+              .select("*")
+              .eq("user_id", newMessage.send_by)
+              .single();
 
-          if (userError) {
-            console.error("Error fetching user for new message:", userError.message);
+            if (userError) {
+              console.error(
+                "Error fetching user for new message:",
+                userError.message
+              );
+            }
+
+            const messageWithUser = { ...newMessage, user };
+            setMessages((prevMessages) => [...prevMessages, messageWithUser]);
+          } else if (payload.eventType === "UPDATE") {
+            const updatedMessage = payload.new;
+            console.log("Message updated:", updatedMessage);
+
+            const { data: user, error: userError } = await supabase
+              .from("User")
+              .select("*")
+              .eq("user_id", updatedMessage.send_by)
+              .single();
+
+            if (userError) {
+              console.error(
+                "Error fetching user for updated message:",
+                userError.message
+              );
+            }
+
+            const messageWithUser = { ...updatedMessage, user };
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) =>
+                msg.id === messageWithUser.id ? messageWithUser : msg
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setMessages((prevMessages) =>
+              prevMessages.filter((msg) => msg.id !== payload.old.id)
+            );
           }
-
-          const messageWithUser = { ...newMessage, user };
-          setMessages((prevMessages) => [...prevMessages, messageWithUser]);
-        } else if (payload.eventType === "UPDATE") {
-          const updatedMessage = payload.new;
-          console.log("Message updated:", updatedMessage);
-
-          const { data: user, error: userError } = await supabase
-            .from("User")
-            .select("*")
-            .eq("user_id", updatedMessage.send_by)
-            .single();
-
-          if (userError) {
-            console.error("Error fetching user for updated message:", userError.message);
-          }
-
-          const messageWithUser = { ...updatedMessage, user };
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) => (msg.id === messageWithUser.id ? messageWithUser : msg))
-          );
-        } else if (payload.eventType === "DELETE") {
-          setMessages((prevMessages) =>
-            prevMessages.filter((msg) => msg.id !== payload.old.id)
-          );
         }
-      })
+      )
       .subscribe();
 
     return () => {
       console.log("Removing channel subscription...");
       supabase.removeChannel(channel);
     };
-  }, []); // No need to depend on messages here
+  }, []);
 
   useEffect(() => {
     const fetchOnlineUserCount = async () => {
       const { data, count, error } = await supabase
         .from("online_users")
-        .select('*', { count: 'exact' })  
-        .eq('status', 'online'); 
+        .select("*", { count: "exact" })
+        .eq("status", "online");
 
       setcurrentU(data);
-      
+
       if (error) {
         console.error("Error fetching online user count:", error.message);
       } else {
@@ -109,10 +140,14 @@ function ListMessages({ setcurrentU, setOnlineUserCount, addMessage, messages, s
     fetchOnlineUserCount();
 
     const channel = supabase
-      .channel('public:online_users')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'online_users' }, () => {
-        fetchOnlineUserCount(); 
-      })
+      .channel("public:online_users")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "online_users" },
+        () => {
+          fetchOnlineUserCount();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -120,7 +155,6 @@ function ListMessages({ setcurrentU, setOnlineUserCount, addMessage, messages, s
     };
   }, []);
 
-  // Scroll to bottom whenever messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -129,6 +163,24 @@ function ListMessages({ setcurrentU, setOnlineUserCount, addMessage, messages, s
 
   return (
     <>
+      {Object.keys(typingStatus).length ? (
+        <div className=" border-2 px-10 py-3 text-sm  text-slate-400 border-[#00b0ff] rounded-lg shadow-[#00b0ff] shadow-md ">
+          {Object.keys(typingStatus)
+            .slice(0, 1)
+            .map((userId) =>
+              typingStatus[userId] ? (
+                <div className="flex">
+                  <p key={userId}>{typingStatus[userId]} is typing</p>
+                  <div class="flex space-x-2 justify-center items-center bg-[#100f18]">
+                    <div class="h-1 w-1 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s] ml-2"></div>
+                    <div class="h-1 w-1 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                    <div class="h-1 w-1 bg-slate-400 rounded-full animate-bounce"></div>
+                  </div>
+                </div>
+              ) : null
+            )}
+        </div>
+      ) : null}
       {!loading ? (
         <div>
           {messages.map((message) => (
@@ -145,9 +197,12 @@ function ListMessages({ setcurrentU, setOnlineUserCount, addMessage, messages, s
               messages={message}
               open={open}
               setOpen={setOpen}
+              reply={reply}
+              setReplyM={setReplyM}
+              messageRef={messageRef}
             />
           ))}
-          <div ref={messagesEndRef} /> {/* This is where we scroll to */}
+          <div ref={messagesEndRef} />
         </div>
       ) : (
         <MessageLoad />

@@ -11,7 +11,6 @@ function Navbar() {
       localStorage.removeItem("user");
       navigate("/");
     }, 4 * 60 * 60 * 1000);
-  
   });
   const logOut = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -32,7 +31,6 @@ function Navbar() {
         localStorage.setItem("user", null);
         navigate("/");
         window.location.reload();
-   
       }, 1000);
     } else {
       toast.error(`Logout error: ${error.message}`);
@@ -42,31 +40,29 @@ function Navbar() {
     <>
       {localStorage.getItem("user") &&
         localStorage.getItem("user") !== "null" && (
-         <div>
-           <nav className=" bg-slate-900 ">
-            <h1 className="text-xl font-semibold ">RBU HUB</h1>
-            <Link to="/" className="hover:font-semibold hover:text-green-500">
-              Home
-            </Link>
-            <Link
-              to="/create"
-              className="hover:font-semibold hover:text-green-500"
-            >
-              Create New Note
-            </Link>
-            <Link
-              to="/chat"
-              className="hover:font-semibold hover:text-green-500"
-            >
-              Chats
-            </Link>
-            <button className="text-white font-semibold" onClick={logOut}>
-              LogOut{" "}
-            </button>
-          </nav>
-       
-         </div>
-          
+          <div>
+            <nav className=" bg-slate-900 ">
+              <h1 className="text-xl font-semibold ">RBU HUB</h1>
+              <Link to="/" className="hover:font-semibold hover:text-green-500">
+                Home
+              </Link>
+              <Link
+                to="/create"
+                className="hover:font-semibold hover:text-green-500"
+              >
+                Create New Note
+              </Link>
+              <Link
+                to="/chat"
+                className="hover:font-semibold hover:text-green-500"
+              >
+                Chats
+              </Link>
+              <button className="text-white font-semibold" onClick={logOut}>
+                LogOut{" "}
+              </button>
+            </nav>
+          </div>
         )}
     </>
   );

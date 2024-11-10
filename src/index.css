@@ -2,9 +2,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@font-face { 
-  font-family: "product"; 
-  src: url("./assets/Product.ttf"); 
+@font-face {
+  font-family: "product";
+  src: url("./assets/Product.ttf");
 }
 
 h1,

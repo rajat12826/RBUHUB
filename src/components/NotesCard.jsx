@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import supabase from "../config/supabaseClients";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
-const NotesCard = ({note, onDelete }) => {
+const NotesCard = ({ note, onDelete }) => {
   const handleDelete = async () => {
     const { data, error } = await supabase
       .from("notes")

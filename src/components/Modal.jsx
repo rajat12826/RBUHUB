@@ -1,8 +1,5 @@
-
-
 export default function Modal({ open, onClose, children }) {
   return (
-    
     <div
       onClick={onClose}
       className={`
@@ -10,7 +7,6 @@ export default function Modal({ open, onClose, children }) {
         ${open ? "visible bg-black/20" : "invisible"}
       `}
     >
-     
       <div
         onClick={(e) => e.stopPropagation()}
         className={`
@@ -19,9 +15,8 @@ export default function Modal({ open, onClose, children }) {
           ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}
         `}
       >
-       
         {children}
       </div>
     </div>
-  )
+  );
 }

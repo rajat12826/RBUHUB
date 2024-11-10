@@ -18,7 +18,7 @@ const Create = ({ user }) => {
     setLoading(true);
     e.preventDefault();
 
-    if (!sub || !note ) {
+    if (!sub || !note) {
       const errorMsg = "Please fill all fields";
       setFormError(errorMsg);
       toast.error(errorMsg);
@@ -27,7 +27,7 @@ const Create = ({ user }) => {
 
     const { data, error } = await supabase
       .from("notes")
-      .insert([{ subject:sub, note,  user_id: user.user.id }]);
+      .insert([{ subject: sub, note, user_id: user.user.id }]);
 
     if (error) {
       const errorMsg = `Error occurred: ${error.message}`;

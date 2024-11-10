@@ -22,9 +22,7 @@ const Home = ({ user, loading, setLoading }) => {
         .from("notes")
         .select()
         .order(orderBy, { ascending: false });
-      // const filteredSmoothies = data.filter(
-      //   (smoothie) => smoothie.user_id === user?.user.id
-      // );
+
       console.log(notes);
       if (data.length <= 0) {
         toast.error("No Notes found.");
@@ -78,7 +76,6 @@ const Home = ({ user, loading, setLoading }) => {
                   >
                     Subject
                   </button>
-                 
                 </div>
               </div>
               <div>

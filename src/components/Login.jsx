@@ -53,18 +53,22 @@ function Login({ setL, loading, setLoading }) {
       toast.success("Sign-in successful!");
 
       console.log(data.user.id);
-      const { data: data1, error: error1 } = await supabase.from("User").select("*").eq("user_id",data.user.id)
+      const { data: data1, error: error1 } = await supabase
+        .from("User")
+        .select("*")
+        .eq("user_id", data.user.id);
 
-  console.log(error1,data1[0].avatar);
-  
+      console.log(error1, data1[0].avatar);
 
       const { error: onlineUserError } = await supabase
         .from("online_users")
         .insert([
           {
-              avatar:data1[0].avatar?data1[0].avatar:"https://pbs.twimg.com/media/D0oEaNJWwAASCwt?format=jpg&name=small",
-            username:data1[0].username?data1[0].username:"Anonymous",
-          
+            avatar: data1[0].avatar
+              ? data1[0].avatar
+              : "https://pbs.twimg.com/media/D0oEaNJWwAASCwt?format=jpg&name=small",
+            username: data1[0].username ? data1[0].username : "Anonymous",
+
             status: "online",
           },
         ]);
