@@ -395,7 +395,7 @@ function ChatCard({
               <div className="flex gap-4">
                 <button
                   className="btn btn-danger w-full bg-red-500 text-white py-1 rounded-sm hover:bg-transparent hover:text-red-500 hover:font-semibold shadow-red-500 shadow-sm"
-                  onClick={deleteFn}
+                  onClick={()=>(deleteFn)}
                 >
                   Delete
                 </button>
