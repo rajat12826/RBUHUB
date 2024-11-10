@@ -6,6 +6,11 @@ import {
   MenuList,
   MenuItem,
   Button,
+  Card,
+  CardBody,
+  CardFooter,
+  Typography,
+ 
   Dialog,
   DialogHeader,
   DialogFooter,
@@ -17,12 +22,13 @@ import Modal from "./Modal";
 function ChatCard({ addMessage,allMessage,messages,message, setMessages,sender, sendAt, user, id,open,setOpen}) {
   // console.log(allMessage);
  
-  
+  console.log(messages.user)
   const [up,setUp]=useState(id === user?.user.id)
   let u=JSON.parse(localStorage.getItem('user'))
 ;
-  
+  const[d,setD]=useState(messages.user?.created_at)
  const [update, setUpdate] = useState(false); 
+ const [profileopen, setprofileopen] = useState(false);
  const [upmess,setupmess]=useState(message)
 useEffect(()=>{
   if(id === u?.user.id){
@@ -117,6 +123,7 @@ useEffect(()=>{
     handleUpdate(messages.id)
   }
   const date = new Date(sendAt);
+  
   const options = {
     year: "numeric",
     month: "long",
@@ -129,24 +136,72 @@ useEffect(()=>{
 
   return (
     <>
-   
+   <div className={`${true?" flex w-full justify-end ":null}   `}>
       <div className="flex px-10 py-5 w-full items-start space-x-4">
+        <div className={`flex ${up?" hidden   ":null} cursor-pointer `} onClick={()=>setprofileopen(true)}>
         <img
           src= {messages.user?messages.user?.avatar:"https://pbs.twimg.com/media/D0oEaNJWwAASCwt?format=jpg&name=small"}
           className="w-12 h-12 rounded-full object-cover"
           alt="User avatar"
         />
-
+        </div>
+        <Modal open={profileopen} onClose={() => 
+       
+          
+          setprofileopen(false)}>
+          <div className="text-center w-56 ">
+           <div className="flex justify-center ">
+           <div className="">
+           <img
+          src= {messages.user?messages.user?.avatar:"https://pbs.twimg.com/media/D0oEaNJWwAASCwt?format=jpg&name=small"}
+          className="w-12 h-12 rounded-full object-cover"
+          alt="User avatar"
+        />
+           </div>
+           </div>
+            <div className="mx-auto my-4 w-48">
+              <h3 className="text-lg font-black text-gray-800">
+              {sender?.substring(0, 15)}
+              </h3>
+              <p className="text-sm text-gray-500 ">
+              User From:  {new Date(messages.user?.created_at).toLocaleString("en-IN", options)}
+              </p>
+            </div>
+            <div className="flex gap-4">
+              
+              <button
+                className="btn btn-light w-full text-red-500 py-1 font-semibold hover:bg-red-100 hover:rounded-sm"
+                onClick={() => setprofileopen(false)}
+              >
+                Back
+              </button>
+            </div>
+          </div>
+        </Modal>
         <div className="flex-1">
-          <div className="flex items-center">
+        <div className={`flex ${up?" justify-end ":null} items-center `}>
             <h1 className="text-white font-semibold text-sm">
               {sender?.substring(0, 15)}
             </h1>
             <h1 className="text-zinc-400 pl-2 max-sm:text-sm ">
               {date.toLocaleString("en-IN", options)}
             </h1>
+            {!up?
+              <div className="cursor-pointer ">
+              <svg class="h-4 w-8 text-gray-300"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+  </svg>
+              </div>:null
+            }
             {up ? (
               <div className="flex items-center pl-4 visible">
+                <div className={`flex ${up?"   ":null} cursor-pointer `} onClick={()=>setprofileopen(true)}>
+        <img
+          src= {messages.user?messages.user?.avatar:"https://pbs.twimg.com/media/D0oEaNJWwAASCwt?format=jpg&name=small"}
+          className="w-12 h-12 rounded-full object-cover"
+          alt="User avatar"
+        />
+        </div>
                 <Menu>
                   <MenuHandler>
                     <Button className="flex items-center bg-gray-800 hover:bg-gray-700 p-2 rounded-full">
@@ -181,7 +236,7 @@ useEffect(()=>{
               </div>
             ):null}
           </div>
-          <h1 className="text-slate-400 text-sm">{message}</h1>
+          <h1 className={`flex ${up?" justify-end mr-20 ":null} text-slate-400 text-sm`} >{message}</h1>
         </div>
         <Modal open={open} onClose={() => setOpen(false)}>
           <div className="text-center w-56">
@@ -237,6 +292,7 @@ useEffect(()=>{
         onChange={(e) => setupmess(e.target.value)}
         rows={4} // Adjust rows as needed
       />
+      
     </div>
     <div className="flex gap-4 mt-4">
       <button
@@ -259,6 +315,7 @@ useEffect(()=>{
 </Modal>
 
 
+      </div>
       </div>
 <Toaster/>
       
