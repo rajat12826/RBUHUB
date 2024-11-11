@@ -14,8 +14,10 @@ import {
   MenuItem,
   Button,
 } from "@material-tailwind/react";
-import { useNavigate } from "react-router-dom";
-function Chat({ user }) {
+import { useNavigate, useParams } from "react-router-dom";
+import ListRoom from "./ListRoom";
+function ChatRoom({ user }) {
+  const { roomId } = useParams();
   const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [messages, setMessages] = useState([]);
  
@@ -63,11 +65,11 @@ function Chat({ user }) {
           .from("online_users")
           .select("*")
           .eq("user_id", user?.user.id)
-          .is("room_id",null)
+          .is("room_id",roomId)
           .single();
 
         if (data1 && (existingUserError || !existingUser)) {
-          
+         
           const { error: onlineUserError } = await supabase
             .from("online_users")
             .upsert([
@@ -75,7 +77,7 @@ function Chat({ user }) {
                 avatar: data1.avatar || "https://default-avatar-url.com",
                 username: data1.username || "Anonymous",
                 status: "online",
-                room_id:null
+                room_id:roomId
               },
             ]);
 
@@ -90,39 +92,8 @@ function Chat({ user }) {
         console.error("Error during user data fetch:", err);
       }
     };
-   
+
     fetchUserData();
-    
-  }, []);
-  useEffect(() => {
-    
-    const onlineU = supabase
-      .channel("public:online_users")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "online_users" }, // event filter
-        async (payload) => {
-          // console.log(payload, "fr");
-
-         
-          const { new: newTypingStatus, old: oldTypingStatus } = payload;
-
-         
-          if (payload.event === "INSERT" && newTypingStatus.room_id==null) {
-            setOnlineUserCount((prev) => prev + 1); // Increment user count
-          }
-
-          
-          if (payload.event === "DELETE" && oldTypingStatus) {
-            setOnlineUserCount((prev) => prev - 1); // Decrement user count
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      onlineU.unsubscribe();
-    };
   }, []);
   const navigate = useNavigate();
   useEffect(() => {
@@ -162,24 +133,7 @@ function Chat({ user }) {
       }
     };
   }, []); 
-
-  // useEffect(async() => {
-
-  //   const { data: userData, error: userError } =  await supabase
-  //   .from("User")
-  //   .select("username")
-  //   .eq("user_id", user?.user.id)
-  //   .single();
-  //   setTimeout(async () => {
-  //     // await supabase.from("typing_status").delete().eq("user", user.user.id);
-  //     setTypingStatus((prev) => {
-  //       const updatedStatus = { ...prev };
-  //       if(updatedStatus[userData.username]){
-  //       delete updatedStatus[userData.username];}
-  //       return updatedStatus;
-  //     });
-  //   }, 5000);
-  // }, []);
+ 
   const handleTyping = async () => {
     const { data: userData, error: userError } = await supabase
       .from("User")
@@ -232,7 +186,7 @@ const handleCreateRoom = async () => {
       return;
     }
 
-    
+   
     await supabase.from("room_members").insert([
       { room_id: data.id, user_id: user?.user.id },
     ]);
@@ -245,7 +199,7 @@ const handleCreateRoom = async () => {
 };
 
 const handleJoinRoom = async (roomId) => {
-  
+ 
   if (!roomId.trim()) {
     toast.error("Please enter a room ID to join!");
     return;
@@ -285,7 +239,7 @@ const handleJoinRoom = async (roomId) => {
         text: reply && reply.message ? reply.message : null,
         time: reply && reply.time ? reply.time : null,
       },
-      room_id:null
+      room_id:roomId
     };
     setReplyM({});
     const { data, error } = await supabase.from("messages").insert(newMessage);
@@ -296,7 +250,40 @@ const handleJoinRoom = async (roomId) => {
       toast.success("Message sent!");
     }
   };
-
+  useEffect(() => {
+    const onlineU = supabase
+      .channel("public:online_users")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "online_users" }, 
+        async (payload) => {
+          const { new: newTypingStatus, old: oldTypingStatus } = payload;
+  
+          if (payload.eventType === "INSERT" || (payload.eventType === "UPDATE" && newTypingStatus?.room_id)) {
+           
+            if (!currentU || currentU.length <= 0 || !currentU.some((user) => user.user_id === newTypingStatus.user_id)) {
+              setcurrentU((prev) => {
+                const currentArray = Array.isArray(prev) ? prev : []; 
+                return [...currentArray, newTypingStatus]; 
+              });
+              setOnlineUserCount((prev) => prev + 1); 
+            }
+          }
+  
+          
+          if (payload.event === "DELETE" && oldTypingStatus) {
+            setcurrentU((prev) => prev.filter((user) => user.user_id !== oldTypingStatus.user_id));
+            setOnlineUserCount((prev) => prev - 1);
+          }
+        }
+      )
+      .subscribe();
+  
+    return () => {
+      onlineU.unsubscribe();
+    };
+  }, []);  
+  
   const onDelete = (id) => {
     setMessages((prev) => prev.filter((sm) => sm.id !== id));
   };
@@ -319,7 +306,7 @@ const handleJoinRoom = async (roomId) => {
   return (
     <>
       {!loading ? (
-        <div className="bg-[#100f18] h-full flex  flex-col">
+        <div className="bg-[#100f18] h-full flex flex-col">
           <div className="flex-grow overflow-auto">
             <nav className="flex justify-between p-4 font-product">
               <div className="text-red-50 ">
@@ -331,7 +318,7 @@ const handleJoinRoom = async (roomId) => {
                     <MenuHandler>
                       <Button className="bg-[#100f18]">
                         <h1 className=" text-sm text-gray-500">
-                          {onlineUserCount} online
+                          {currentU?.length} online
                         </h1>
                       </Button>
                     </MenuHandler>
@@ -339,7 +326,7 @@ const handleJoinRoom = async (roomId) => {
                       <h1 className="flex justify-center font-bold cursor-default">
                         Online Users
                       </h1>
-                      {currentU.map((user) => (
+                      {currentU?.map((user) => (
                         <MenuItem
                           key={user.id}
                           className="font-semibold flex  items-center justify-center hover:bg-gray-200 "
@@ -359,39 +346,43 @@ const handleJoinRoom = async (roomId) => {
                 </div>
               </div>
               <Menu>
-                <MenuHandler className="mr-24">
+                <MenuHandler className="mr-24 ">
                   <button className="text-slate-200 font-semibold hover:text-slate-400 mr-5">
-                   <h1 className="text-slate-400"> Rooms</h1>
+                   <h1 className="text-slate-400 "> Rooms</h1>
                   </button>
                 </MenuHandler>
-                <MenuList className="ml-10 bg-gray-900 shadow-md shadow-[#03a9f4] border-[#03a9f4] border-2">
+                <MenuList className="ml-10 bg-gray-900 shadow-md shadow-[#03a9f4] border-[#03a9f4] border-2 font-product">
                   <MenuItem
                     
-                    className=" flex  items-center justify-center hover:bg-text-800 font-semibold "
+                    className=" flex  items-center justify-center hover:bg-text-800  "
                   >
-                  <button className=" text-slate-300  hover:text-slate-500 mr-5"   onClick={handleCreateRoom}><h1 className="font-bold font-product" >  Create A Room</h1></button>
+                  <button className=" text-slate-300 font-semibold hover:text-slate-500 mr-5"   onClick={handleCreateRoom}><h1 className="font-semibold  "> Create A Room</h1></button>
                   </MenuItem>
                       <MenuItem
                     
                     className=" flex  items-center justify-center hover:bg-text-800 "
                   >
-                  <button className=" text-slate-300 font-semibold hover:text-slate-500 mr-5"><h1 className="font-bold font-product " onClick={ handleJoinRoom}> Join A Rooms:</h1></button>
+                  <button className=" text-slate-300 font-semibold hover:text-slate-500 mr-5"><h1 className="font-semibold " onClick={ handleJoinRoom}> Join  Rooms:</h1></button>
                   </MenuItem>
-                  {rooms.map((room)=>{
+                <div className="ml-20">
+                {rooms.map((room)=>{
                   return <MenuItem
-  className="flex items-center justify-center font-product font-semibold  text-gray-300 hover:bg-text-800"
+  className="flex items-center justify-center text-gray-300 hover:text-slate-500 hover:bg-text-800"
   onClick={() => handleJoinRoom(room.id)}
 >
   <h1 className="font-semibold">{room.name}</h1>
 </MenuItem>
                   })}
+                </div>
+                  
                 </MenuList>
               </Menu>
             </nav>
             <div className="bg-gray-800 w-full h-[1px]"></div>
 
             <div className="p-4">
-              <ListMessages
+              <ListRoom
+              roomId={roomId}
                 messages={messages}
                 setMessages={setMessages}
                 user={user}
@@ -429,4 +420,4 @@ const handleJoinRoom = async (roomId) => {
   );
 }
 
-export default Chat;
+export default ChatRoom;

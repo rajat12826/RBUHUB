@@ -41,7 +41,7 @@ function Navbar() {
       {localStorage.getItem("user") &&
         localStorage.getItem("user") !== "null" && (
           <div>
-            <nav className=" bg-slate-900 ">
+            <nav className=" bg-slate-900 font-product ">
               <h1 className="text-xl font-semibold ">RBU HUB</h1>
               <Link to="/" className="hover:font-semibold hover:text-green-500">
                 Home

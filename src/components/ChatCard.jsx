@@ -50,6 +50,8 @@ function ChatCard({
   const [update, setUpdate] = useState(false);
   const [profileopen, setprofileopen] = useState(false);
   const [upmess, setupmess] = useState(message);
+  // console.log(allMessage);
+  
   useEffect(() => {
     if (id === u?.user.id) {
       setUp(true);
@@ -158,7 +160,9 @@ const deleteFn = async() => {
     <>
       <div
         ref={(el) => {
-          messageRef.current[messages.id] = el;
+          if(messageRef){
+            messageRef.current[messages.id] = el
+          }
         }}
         className={`${true ? " flex w-full justify-end " : null} ${
           reply?.id && messages.id == reply.id
@@ -327,7 +331,7 @@ const deleteFn = async() => {
                       </div>
 
                       <div className={`${open ? " pr-10 " : null} `}>
-                        <Menu className="w-full">
+                        <Menu className="w-full font-product ">
                           <MenuHandler>
                             <Button className="flex items-center bg-gray-800 hover:bg-gray-700 p-2 rounded-full">
                               <svg
@@ -352,12 +356,12 @@ const deleteFn = async() => {
                                 <Button
                                   onClick={() => setUpdate(true)}
                                   variant="gradient"
-                                  className="bg-gray-800"
+                                  className="bg-gray-800 font-product"
                                 >
                                   Edit
                                 </Button>
                               </MenuItem>
-                              <MenuItem className="px-4 py-2 text-slate-100 hover:bg-gray-700 rounded-lg">
+                              <MenuItem className="px-4 py-2 text-slate-100 font-product hover:bg-gray-700 rounded-lg">
                                 <Button onClick={handleOpen} variant="gradient">
                                   Delete
                                 </Button>
@@ -380,7 +384,7 @@ const deleteFn = async() => {
             </h1>
           </div>
           <Modal open={open} onClose={() => setOpen(false)}>
-            <div className="text-center w-56">
+            <div className="text-center w-56 font-product ">
               <div className="flex justify-center ">
                 <svg
                   class="h-12 w-12 text-red-500"
@@ -408,7 +412,7 @@ const deleteFn = async() => {
               </div>
               <div className="flex gap-4">
                 <button
-                  className="btn btn-danger w-full bg-red-500 text-white py-1 rounded-sm hover:bg-transparent hover:text-red-500 hover:font-semibold shadow-red-500 shadow-sm"
+                  className="btn btn-danger w-full bg-[#ff1744] text-white py-1 hover:border-2 hover:border-[#f50057] rounded-sm hover:bg-transparent hover:text-red-500 hover:font-semibold "
                   onClick={deleteFn}
                 >
                   Delete
@@ -423,7 +427,7 @@ const deleteFn = async() => {
             </div>
           </Modal>
           <Modal open={update} onClose={() => setUpdate(false)}>
-            <div className="bg-white text-center w-72 mx-auto p-6 rounded-lg shadow-md">
+            <div className="bg-white text-center w-72 mx-auto p-6 rounded-lg shadow-md font-product border-2 ">
               <h3 className="text-lg font-black text-gray-800 mb-4">
                 Confirm Edit
               </h3>
@@ -440,13 +444,13 @@ const deleteFn = async() => {
               </div>
               <div className="flex gap-4 mt-4">
                 <button
-                  className="w-full bg-green-500 text-white py-2 rounded-sm hover:bg-green-600 transition duration-200"
+                  className="w-full bg-[#2979ff] text-white py-2 rounded-sm hover:bg-transparent hover:text-[#304ffe]  hover:border-2 hover:font-bold hover:border-[#304ffe] transition duration-200"
                   onClick={updateFn}
                 >
                   Update
                 </button>
                 <button
-                  className="w-full text-green-500 font-semibold hover:bg-green-100 py-2 rounded-sm transition duration-200"
+                  className="w-full text-[#00b0ff] font-semibold hover:bg-[#e1f5fe] py-2 rounded-sm transition duration-200"
                   onClick={() => {
                     setUpdate(false);
                     setupmess(message);

@@ -52,7 +52,7 @@ const Home = ({ user, loading, setLoading }) => {
           .select("*")
           .eq("id", user?.user.id)
           .single();
-          console.log(existingUser);
+          // console.log(existingUser);
           
       if (existingUser) {
         await supabase.from("online_users").delete().eq("id", user?.user.id);

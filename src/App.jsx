@@ -9,6 +9,7 @@ import Chat from "./components/Chat";
 
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
+import ChatRoom from "./components/ChatRoom";
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -48,6 +49,7 @@ function App() {
               }
             />
             <Route path="/chat" element={<Chat user={user} />} />
+            <Route path="/room/:roomId" element={<ChatRoom user={user} />} />
           </Routes>
         </BrowserRouter>
       </div>

@@ -4,7 +4,7 @@ import ChatCard from "./ChatCard";
 import Loader from "./Loader";
 import MessageLoad from "./MessageLoad";
 
-function ListMessages({
+function ListRoom({
   typingStatus,
   setTypingStatus,
   setcurrentU,
@@ -19,18 +19,50 @@ function ListMessages({
   handleDelete,
   reply,
   setReplyM,
+  roomId
 }) {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
-  const messageRef = useRef({});
-
+useEffect(() => {
+    const onlineU = supabase
+      .channel("public:online_users")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "online_users" }, 
+        async (payload) => {
+          const { new: newTypingStatus, old: oldTypingStatus } = payload;
+  
+          if (payload.eventType === "INSERT" || (payload.eventType === "UPDATE" && newTypingStatus?.room_id)) {
+           
+            if (!currentU || currentU.length <= 0 || !currentU.some((user) => user.user_id === newTypingStatus.user_id)) {
+              setcurrentU((prev) => {
+                const currentArray = Array.isArray(prev) ? prev : []; 
+                return [...currentArray, newTypingStatus]; 
+              });
+              setOnlineUserCount((prev) => prev + 1); 
+            }
+          }
+  
+         
+          if (payload.event === "DELETE" && oldTypingStatus) {
+            setcurrentU((prev) => prev.filter((user) => user.user_id !== oldTypingStatus.user_id));
+            setOnlineUserCount((prev) => prev - 1); 
+          }
+        }
+      )
+      .subscribe();
+  
+    return () => {
+      onlineU.unsubscribe();
+    };
+  }, []); 
   useEffect(() => {
-    // Fetch existing messages when component mounts
     const fetchMessages = async () => {
+ 
       const { data: messages, error } = await supabase
         .from("messages")
         .select("*")
-        .is("room_id", null); // Fetch messages with null room_id
+        .eq("room_id", roomId);
 
       if (error) {
         console.error("Error fetching messages:", error.message);
@@ -60,17 +92,16 @@ function ListMessages({
 
     fetchMessages();
 
-    // Set up real-time subscription to the messages table
+   
     const channel = supabase
-      .channel("public:messages")
+      .channel(`public:messages:room_${roomId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "messages" },
+        { event: "*", schema: "public", table: "messages", filter: `room_id=eq.${roomId}` },
         async (payload) => {
           if (payload.eventType === "INSERT") {
             const newMessage = payload.new;
 
-            // Fetch the user associated with the new message
             const { data: user, error: userError } = await supabase
               .from("User")
               .select("*")
@@ -82,13 +113,10 @@ function ListMessages({
             }
 
             const messageWithUser = { ...newMessage, user };
-
-            // Update state with the new message
             setMessages((prevMessages) => [...prevMessages, messageWithUser]);
           } else if (payload.eventType === "UPDATE") {
             const updatedMessage = payload.new;
 
-            // Fetch the updated user information
             const { data: user, error: userError } = await supabase
               .from("User")
               .select("*")
@@ -100,8 +128,6 @@ function ListMessages({
             }
 
             const messageWithUser = { ...updatedMessage, user };
-
-            // Update the message in the state
             setMessages((prevMessages) =>
               prevMessages.map((msg) =>
                 msg.id === messageWithUser.id ? messageWithUser : msg
@@ -116,50 +142,20 @@ function ListMessages({
       )
       .subscribe();
 
-    // Cleanup the channel when the component unmounts
+   
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [setMessages]);
+  }, [roomId, setMessages]); 
 
-
-  useEffect(() => {
-    
-    const onlineU = supabase
-      .channel("public:online_users")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "online_users" }, // event filter
-        async (payload) => {
-          // console.log(payload, "fr");
-
-         
-          const { new: newTypingStatus, old: oldTypingStatus } = payload;
-
-         
-          if (payload.event === "INSERT" && newTypingStatus.room_id==null) {
-            setOnlineUserCount((prev) => prev + 1); // Increment user count
-          }
-
-          
-          if (payload.event === "DELETE" && oldTypingStatus) {
-            setOnlineUserCount((prev) => prev - 1); // Decrement user count
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      onlineU.unsubscribe();
-    };
-  }, []);
   useEffect(() => {
     const fetchOnlineUserCount = async () => {
       const { data, count, error } = await supabase
         .from("online_users")
-        .select("*", { count: "exact" })
-        .eq("status", "online")
-        .is("room_id",null)
+        .select("*")
+        // .eq("status", "online")
+        .eq("room_id",roomId)
+// console.log(data)
 
       setcurrentU(data);
 
@@ -189,8 +185,8 @@ function ListMessages({
   }, [setcurrentU, setOnlineUserCount]);
 
   useEffect(() => {
-    // Scroll to the bottom when messages update
-    if (messagesEndRef.current) {
+ 
+    if (messagesEndRef?.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
@@ -215,7 +211,6 @@ function ListMessages({
             )}
         </div>
       ) : null}
-
       {!loading ? (
         <div className="f">
           {messages.map((message) => (
@@ -234,7 +229,6 @@ function ListMessages({
               setOpen={setOpen}
               reply={reply}
               setReplyM={setReplyM}
-              messageRef={messageRef}
             />
           ))}
           <div ref={messagesEndRef} />
@@ -246,4 +240,4 @@ function ListMessages({
   );
 }
 
-export default ListMessages;
+export default ListRoom;
