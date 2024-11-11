@@ -167,7 +167,7 @@ function ChatCard({
             : null
         }   `}
       >
-        <div className="  flex px-10 py-5 w-full items-start space-x-4">
+        <div className={`  flex px-10 ${up?" px-10": " px-3 "}  py-5 w-full items-start space-x-4 max-sm:space-x-0`}>
         <div
             className={` flex ${up ? " hidden   " : null}  cursor-pointer `}
             onClick={() => setprofileopen(true)}
