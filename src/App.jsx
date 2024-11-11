@@ -18,8 +18,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [l, setL] = useState(null);
   useEffect(() => {
-    console.log(user);
-    console.log(l);
+    
   }, [user]);
 
   return (

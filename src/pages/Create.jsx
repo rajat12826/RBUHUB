@@ -12,7 +12,7 @@ const Create = ({ user }) => {
   const [note, setNote] = useState("");
   // const [rating, setRating] = useState(0);
   const [formError, setFormError] = useState(null);
-  console.log(user.user.id);
+;
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -49,7 +49,7 @@ useEffect(()=>{
         .select("*")
         .eq("id", user?.user.id)
         .single();
-        console.log(existingUser);
+     
         
     if (existingUser) {
       await supabase.from("online_users").delete().eq("id", user?.user.id);

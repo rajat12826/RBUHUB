@@ -14,7 +14,7 @@ const Home = ({ user, loading, setLoading }) => {
   const handleDelete = (id) => {
     setNotes((prev) => prev.filter((sm) => sm.id !== id));
   };
-console.log(user);
+
 
   useEffect(() => {
     const fetchSmoothies = async () => {
@@ -24,7 +24,7 @@ console.log(user);
         .select()
         .order(orderBy, { ascending: false });
 
-      console.log(notes);
+     
       if (data.length <= 0) {
         toast.error("No Notes found.");
         setLoading(false);

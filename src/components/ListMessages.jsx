@@ -67,7 +67,7 @@ function ListMessages({
         async (payload) => {
           if (payload.eventType === "INSERT") {
             const newMessage = payload.new;
-            console.log("New message inserted:", newMessage);
+          
             const { data: user, error: userError } = await supabase
               .from("User")
               .select("*")
@@ -85,7 +85,7 @@ function ListMessages({
             setMessages((prevMessages) => [...prevMessages, messageWithUser]);
           } else if (payload.eventType === "UPDATE") {
             const updatedMessage = payload.new;
-            console.log("Message updated:", updatedMessage);
+        
 
             const { data: user, error: userError } = await supabase
               .from("User")
@@ -116,7 +116,7 @@ function ListMessages({
       .subscribe();
 
     return () => {
-      console.log("Removing channel subscription...");
+     
       supabase.removeChannel(channel);
     };
   }, []);

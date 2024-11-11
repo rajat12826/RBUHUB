@@ -36,15 +36,14 @@ function ChatCard({
 
   const scrollToMessage = (id) => {
     if (messageRef.current[id]) {
-      console.log(id);
+
       messageRef.current[id].scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
     }
   };
-  console.log("mes", user);
-  console.log(messages);
+
   const [up, setUp] = useState(id === user?.user.id);
   let u = JSON.parse(localStorage.getItem("user"));
   const [d, setD] = useState(messages.user?.created_at);
@@ -61,20 +60,18 @@ function ChatCard({
 
   const handleOpen = () => setOpen(!open);
   let id1 = id;
-  const deleteFn = () => {
-    console.log(id1);
-    console.log(messages);
-    const onDelete = (id) => {
-      setMessages((prev) => prev.filter((sm) => sm.id !== id));
-    };
-    const handleDelete = async (id) => {
-      console.log(id1, u.user.id);
-
-      if (id1 === u?.user.id) {
+const deleteFn = async() => {
+   
+   
+    // const handleDelete = async (id) => {
+      // console.log(id1, u.user.id);
+      console.log("dnejnde");
+      if (up) {
+        console.log("dnejnde")
         const { data, error } = await supabase
           .from("messages")
           .delete()
-          .eq("id", id)
+          .eq("id", messages.id)
           .select();
 
         if (error) {
@@ -82,16 +79,18 @@ function ChatCard({
           return;
         }
         if (data) {
-          // console.log(data);
+         
           toast.success(" Message Deleted Successfully!!!!");
-
-          onDelete(id);
+          const onDelete = (id) => {
+            setMessages((prev) => prev.filter((sm) => sm.id !== id));
+          };
+          onDelete(messages.id);
         }
       }
       setOpen(false);
-    };
+    // };
 
-    handleDelete(messages.id);
+    // handleDelete(messages.id);
   };
   const updateFn = () => {
     const onUpdate = (id) => {
@@ -102,7 +101,7 @@ function ChatCard({
       );
 
       setMessages(updatedMessages);
-      console.log(allMessage);
+    
     };
     const handleUpdate = async (id) => {
       if (id1 === u?.user.id) {
@@ -111,7 +110,7 @@ function ChatCard({
           .update({ text: upmess, created_at: new Date().toISOString() })
           .eq("id", id)
           .select();
-        console.log(data);
+      
         if (error) {
           toast.error("Unable To Find You Message!!!!");
           return;
@@ -140,7 +139,7 @@ function ChatCard({
     hour12: true,
   };
   const handleReply = (id) => {
-    console.log(reply);
+    
 
     if (reply.id) {
       setReplyM({});
@@ -151,7 +150,7 @@ function ChatCard({
         time: date.toLocaleString("en-IN", options),
         id: messages.id,
       });
-      console.log(reply, "hi");
+    
       scrollToMessage(id);
     }
   };
@@ -410,7 +409,7 @@ function ChatCard({
               <div className="flex gap-4">
                 <button
                   className="btn btn-danger w-full bg-red-500 text-white py-1 rounded-sm hover:bg-transparent hover:text-red-500 hover:font-semibold shadow-red-500 shadow-sm"
-                  onClick={()=>(deleteFn)}
+                  onClick={deleteFn}
                 >
                   Delete
                 </button>

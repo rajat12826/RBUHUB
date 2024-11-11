@@ -17,13 +17,12 @@ import {
 function Chat({ user }) {
   const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [messages, setMessages] = useState([]);
-  console.log(user?.user, "d");
+ 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentU, setcurrentU] = useState([]);
   const [typingStatus, setTypingStatus] = useState({});
-  console.log(currentU);
-  console.log(typingStatus);
+
   const [us, setUs] = useState("");
   useEffect(() => {
     const fetchUserData = async () => {
@@ -78,12 +77,12 @@ function Chat({ user }) {
         { event: "*", schema: "public", table: "typing_status" },
         async (payload) => {
           const { new: newTypingStatus, old: oldTypingStatus } = payload;
-          console.log("Payload received:", payload);
+        
   
           if (payload.eventType === "INSERT" && payload.new.username) {
             const username = payload.new.username;
             if (payload.new.typing) {
-              console.log(`${username} is typing`);
+           
               setTypingStatus((prev) => ({
                 ...prev,
                 [payload.new.id]: username,
@@ -140,7 +139,7 @@ function Chat({ user }) {
       return;
     }
 
-    console.log(userData.username);
+    
 
     await supabase.from("typing_status").upsert([
       {
@@ -177,7 +176,7 @@ function Chat({ user }) {
       .select("username")
       .eq("user_id", user?.user.id)
       .single();
-    console.log(userData);
+    c
 
     const newMessage = {
       id: uuidv4(),
