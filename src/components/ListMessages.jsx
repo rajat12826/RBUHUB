@@ -182,7 +182,7 @@ function ListMessages({
         </div>
       ) : null}
       {!loading ? (
-        <div>
+        <div className="f">
           {messages.map((message) => (
             <ChatCard
               key={message.id}

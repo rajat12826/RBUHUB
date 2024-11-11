@@ -26,6 +26,51 @@ function Chat({ user }) {
   console.log(typingStatus);
   const [us, setUs] = useState("");
   useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: data1, error: error1 } = await supabase
+          .from("User")
+          .select("*")
+          .eq("user_id", user?.user.id)
+          .single();
+  
+        if (error1) {
+          console.error("Error fetching user data:", error1);
+          return;
+        }
+  
+        // Insert or update the online_users table
+        const { data: existingUser, error: existingUserError } = await supabase
+          .from("online_users")
+          .select("*")
+          .eq("user_id", user?.user.id)
+          .single();
+  
+        if (data1 && (existingUserError || !existingUser)) {
+          // Insert the user if they don't exist
+          const { error: onlineUserError } = await supabase
+            .from("online_users")
+            .upsert([
+              {
+                avatar: data1.avatar || "https://default-avatar-url.com",
+                username: data1.username || "Anonymous",
+                status: "online",
+              },
+            ]);
+  
+          if (onlineUserError) {
+            console.error("Error inserting into online_users:", onlineUserError.message);
+          }
+        }
+      } catch (err) {
+        console.error("Error during user data fetch:", err);
+      }
+    };
+  
+    fetchUserData();
+  }, [user?.user.id]); // Add dependencies properly
+  
+  useEffect(() => {
     const typingChannel = supabase
       .channel("public:typing_status")
       .on(
@@ -33,9 +78,8 @@ function Chat({ user }) {
         { event: "*", schema: "public", table: "typing_status" },
         async (payload) => {
           const { new: newTypingStatus, old: oldTypingStatus } = payload;
-
           console.log("Payload received:", payload);
-
+  
           if (payload.eventType === "INSERT" && payload.new.username) {
             const username = payload.new.username;
             if (payload.new.typing) {
@@ -46,38 +90,26 @@ function Chat({ user }) {
               }));
             }
           }
-
+  
           if (payload.eventType === "DELETE" && payload.old) {
-            // const userId = payload.old.user;
-
-            // const { data: userData, error: userError } = await supabase
-            //   .from("User")
-            //   .select("username")
-            //   .eq("user_id", userId)
-            //   .single();
-
-            // if (userError) {
-            //   console.error("Error fetching user data for DELETE event:", userError);
-            //   return;
-            // }
-
-            // if (userData?.username) {
-            // console.log(`${userData.username} stopped typing`);
             setTypingStatus((prev) => {
               const newState = { ...prev };
               delete newState[payload.old.id];
               return newState;
             });
-            // }
           }
         }
       )
       .subscribe();
-
+  
+    // Clean up the subscription when the component unmounts or when dependencies change
     return () => {
-      supabase.removeChannel(typingChannel);
+      if (typingChannel) {
+        typingChannel.unsubscribe();
+      }
     };
-  }, []);
+  }, []); // Ensure to include any dependencies that should trigger re-runs
+  
 
   // useEffect(async() => {
 

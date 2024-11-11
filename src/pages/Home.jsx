@@ -14,6 +14,7 @@ const Home = ({ user, loading, setLoading }) => {
   const handleDelete = (id) => {
     setNotes((prev) => prev.filter((sm) => sm.id !== id));
   };
+console.log(user);
 
   useEffect(() => {
     const fetchSmoothies = async () => {
@@ -45,6 +46,19 @@ const Home = ({ user, loading, setLoading }) => {
     if (user) {
       fetchSmoothies();
     }
+    const setU=async()=>{
+      const { data: existingUser, error: existingUserError } = await supabase
+          .from("online_users")
+          .select("*")
+          .eq("id", user?.user.id)
+          .single();
+          console.log(existingUser);
+          
+      if (existingUser) {
+        await supabase.from("online_users").delete().eq("id", user?.user.id);
+      }
+    }
+    setU()
   }, [user, orderBy]);
 
   return (

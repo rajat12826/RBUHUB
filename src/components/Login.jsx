@@ -11,7 +11,24 @@ function Login({ setL, loading, setLoading }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
+  const handleGoogle=async()=>{
+  
+                    
+    const{data}=await supabase.auth.signInWithOAuth({
+provider: 'google',
+options: {
+redirectTo: `http://localhost:5173/`,
+},
+})
+// console.log(JSON.stringify(data));
+localStorage.setItem("user", JSON.stringify(data));
+setTimeout(() => {
+navigate("/");
+}, 500);
+setTimeout(() => {
+window.location.reload();
+}, 500);
+}
   const handleSignIn = async (e) => {
     setLoading(true);
     e.preventDefault();
@@ -60,28 +77,30 @@ function Login({ setL, loading, setLoading }) {
 
       console.log(error1, data1[0].avatar);
 
-      const { error: onlineUserError } = await supabase
-        .from("online_users")
-        .insert([
-          {
-            avatar: data1[0].avatar
-              ? data1[0].avatar
-              : "https://pbs.twimg.com/media/D0oEaNJWwAASCwt?format=jpg&name=small",
-            username: data1[0].username ? data1[0].username : "Anonymous",
+      
+      // const { error: onlineUserError } = await supabase
+      //   .from("online_users")
+      //   .insert([
+      //     {
+      //       avatar: data1[0].avatar
+      //         ? data1[0].avatar
+      //         : "https://pbs.twimg.com/media/D0oEaNJWwAASCwt?format=jpg&name=small",
+      //       username: data1[0].username ? data1[0].username : "Anonymous",
 
-            status: "online",
-          },
-        ]);
+      //       status: "online",
+      //     },
+      //   ]);
 
-      if (onlineUserError) {
-        console.error(
-          "Error inserting into online_users:",
-          onlineUserError.message
-        );
-        toast.error("Failed to update online status.");
-      } else {
+      // if (onlineUserError) {
+      //   console.error(
+      //     "Error inserting into online_users:",
+      //     onlineUserError.message
+      //   );
+      //   toast.error("Failed to update online status.");
+      // } 
+      // else {
         toast.success("Sign-in successful!");
-      }
+      // }
       console.log(JSON.stringify(data));
       localStorage.setItem("user", JSON.stringify(data));
       setTimeout(() => {
@@ -94,7 +113,7 @@ function Login({ setL, loading, setLoading }) {
 
     setLoading(false);
   };
-
+ 
   return (
     <>
       <div className="flex justify-center "></div>
@@ -203,7 +222,7 @@ function Login({ setL, loading, setLoading }) {
                     alt="google"
                     className="h-6 w-6"
                   />{" "}
-                  <h1 className="font-semibold"> Sign In With Google</h1>
+                  <h1 className="font-semibold" onClick={handleGoogle}> Sign In With Google</h1>
                 </Button>
                 <Typography
                   variant="small"

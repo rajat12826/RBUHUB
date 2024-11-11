@@ -168,8 +168,8 @@ function ChatCard({
         }   `}
       >
         <div className="  flex px-10 py-5 w-full items-start space-x-4">
-          <div
-            className={`flex ${up ? " hidden   " : null} cursor-pointer `}
+        <div
+            className={` flex ${up ? " hidden   " : null}  cursor-pointer `}
             onClick={() => setprofileopen(true)}
           >
             <img
@@ -198,6 +198,7 @@ function ChatCard({
                 </div>
               </div>
               <div className="mx-auto my-4 w-48">
+                
                 <h3 className="text-lg font-black text-gray-800">
                   {sender?.substring(0, 15)}
                 </h3>
@@ -266,6 +267,20 @@ function ChatCard({
                   up ? " justify-end  max-sm " : null
                 } items-center  `}
               >
+                 <div
+            className={` flex ${up ? " md:hidden   mr-2" : " hidden"}  cursor-pointer `}
+            onClick={() => setprofileopen(true)}
+          >
+            <img
+              src={
+                messages.user
+                  ? messages.user?.avatar
+                  : "https://pbs.twimg.com/media/D0oEaNJWwAASCwt?format=jpg&name=small"
+              }
+              className="w-12 h-12 rounded-full object-cover"
+              alt="User avatar"
+            />
+          </div>
                 <h1 className="text-white font-semibold text-sm">
                   {sender?.substring(0, 15)}
                 </h1>
@@ -298,7 +313,7 @@ function ChatCard({
                   <div>
                     <div className="flex items-center pl-4 max-sm:p-0 visible">
                       <div
-                        className={`flex ${up ? "   " : null} cursor-pointer `}
+                        className={` max-md:hidden flex ${up ? "   " : null} cursor-pointer `}
                         onClick={() => setprofileopen(true)}
                       >
                         <img

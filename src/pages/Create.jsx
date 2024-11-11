@@ -42,7 +42,21 @@ const Create = ({ user }) => {
     setLoading(false);
     navigate("/");
   };
-
+useEffect(()=>{
+  const setU=async()=>{
+    const { data: existingUser, error: existingUserError } = await supabase
+        .from("online_users")
+        .select("*")
+        .eq("id", user?.user.id)
+        .single();
+        console.log(existingUser);
+        
+    if (existingUser) {
+      await supabase.from("online_users").delete().eq("id", user?.user.id);
+    }
+  }
+  setU()
+},[])
   return (
     <>
       {loading ? (
