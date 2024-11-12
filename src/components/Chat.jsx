@@ -16,6 +16,8 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 function Chat({ user }) {
+  
+  
   const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [messages, setMessages] = useState([]);
  
@@ -71,6 +73,7 @@ function Chat({ user }) {
   };
     
   }, []);
+  console.log(rooms);
 
   
   useEffect(() => {
@@ -273,7 +276,7 @@ const handleCreateRoom = async () => {
   }
 };
 
-const handleJoinRoom = async (roomId) => {
+const handleJoinRoom = async (roomId,roomname) => {
   
   if (!roomId.trim()) {
     toast.error("Please enter a room ID to join!");
@@ -281,7 +284,7 @@ const handleJoinRoom = async (roomId) => {
   }
 
   
-  navigate(`/room/${roomId}`);
+  navigate(`/room/${roomname}`,{ state: { roomId } });
 };
 
   useEffect(() => {
@@ -415,7 +418,7 @@ const handleJoinRoom = async (roomId) => {
                 {rooms.map((room)=>{
                   return <MenuItem
   className="flex items-center justify-center text-gray-300 hover:text-slate-500 hover:bg-text-800"
-  onClick={() => handleJoinRoom(room.id)}
+  onClick={() => handleJoinRoom(room.id,room.name)}
 >
   <h1 className="font-semibold">{room.name}</h1>
 </MenuItem>

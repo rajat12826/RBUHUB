@@ -391,22 +391,23 @@ const deleteFn = async() => {
               </div>
             </div>
             <h1
-              className={`${up?" flex justify-end ":" "}`}
+              className={`${up?" flex justify-end ":"  "}`}
             >
              <h1 className={`flex ${
-                up ? " justify-end  " : null
+                up ? " justify-end  " : " "
               } text-slate-400 text-sm font-product 
               ${up && messages.is_edit?" mr-5":" mr-20 "}
+              ${messages.is_edit?" text-[#00e5ff]":null}
               `}
               
               >
              {message}
              </h1>
               {
-            up && messages.is_edit?
+             messages.is_edit?
               <h1 className={`flex cursor-default ${
-                
-                " justify-end " 
+                up?
+                " justify-end " :"  mr-2"
              } text-[#18ffff]  text-sm font-product `}>Isedited</h1>:null
           }
             </h1>
