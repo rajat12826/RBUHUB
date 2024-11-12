@@ -198,7 +198,12 @@ function ListMessages({
   return (
     <>
       {Object.keys(typingStatus).length ? (
-        <div className="border-2 px-10 py-3 text-sm text-slate-400 border-[#00b0ff] rounded-lg shadow-[#00b0ff] shadow-md">
+        <div className="border-2 px-10 py-3 text-sm text-slate-400 border-[#00b0ff] rounded-lg shadow-[#00b0ff] shadow-md"  onKeyDown={(e) => {
+          if (e.ctrlKey && (e.key === 'p')) {
+         console.log("enedj");
+         
+          }
+        }}>
           {Object.keys(typingStatus)
             .slice(0, 1)
             .map((userId) =>

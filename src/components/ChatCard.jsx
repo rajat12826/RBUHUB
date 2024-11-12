@@ -35,7 +35,7 @@ function ChatCard({
   }, [reply]);
 
   const scrollToMessage = (id) => {
-    if (messageRef.current[id]) {
+    if (messageRef?.current[id]) {
 
       messageRef.current[id].scrollIntoView({
         behavior: "smooth",
@@ -109,7 +109,7 @@ const deleteFn = async() => {
       if (id1 === u?.user.id) {
         const { data, error } = await supabase
           .from("messages")
-          .update({ text: upmess, created_at: new Date().toISOString() })
+          .update({ text: upmess, created_at: new Date().toISOString() ,is_edit:true})
           .eq("id", id)
           .select();
       
@@ -169,8 +169,10 @@ const deleteFn = async() => {
             ? " border-2 border-cyan-300 rounded-lg shadow-md shadow-cyan-400   "
             : null
         }   `}
+       
+    
       >
-        <div className={`  flex px-10 ${up?" px-10": " px-3 "}  py-5 w-full items-start space-x-4 max-sm:space-x-0`}>
+        <div className={`  flex px-10 ${up?" px-10": " px-3 "}  py-5 w-full items-start space-x-4 max-sm:space-x-0 animate-fadeIn `}>
         <div
             className={` flex ${up ? " hidden   " : null}  cursor-pointer `}
             onClick={() => setprofileopen(true)}
@@ -185,6 +187,7 @@ const deleteFn = async() => {
               alt="User avatar"
             />
           </div>
+        
           <Modal open={profileopen} onClose={() => setprofileopen(false)}>
             <div className="text-center w-56 ">
               <div className="flex justify-center ">
@@ -200,12 +203,23 @@ const deleteFn = async() => {
                   />
                 </div>
               </div>
-              <div className="mx-auto my-4 w-48">
+              <div className="mx-auto my-4 w-48" onContextMenu={(e) => e.preventDefault()}>
                 
                 <h3 className="text-lg font-black text-gray-800">
                   {sender?.substring(0, 15)}
                 </h3>
-                <p className="text-sm text-gray-500 ">
+                <p className="text-sm text-gray-500  user-select-none "  onContextMenu={(e) => e.preventDefault()}
+                  onCopy={(e) => e.preventDefault()} 
+                  onMouseUp={(e) => e.preventDefault()} 
+                  onSelect={(e) => e.preventDefault()}
+                  onKeyDown={(e) => {
+                    if (e.ctrlKey && (e.key === 'c' || e.key === 'a')) {
+                      e.preventDefault();
+                    }
+                  }}
+                  style={{ userSelect: "none" }}
+                  >
+                  
                   User From:{" "}
                   {new Date(messages.user?.created_at).toLocaleString(
                     "en-IN",
@@ -223,6 +237,7 @@ const deleteFn = async() => {
               </div>
             </div>
           </Modal>
+          
           <div className="flex-1">
             <div className={`flex ${up ? "justify-end" : ""} items-center`}>
               {messages.replyto_id ? (
@@ -288,7 +303,7 @@ const deleteFn = async() => {
                   {sender?.substring(0, 15)}
                 </h1>
                 <div>
-                  <h1 className="text-zinc-400   pl-2 max-sm:text-sm ">
+                  <h1 className="text-zinc-400 max-sm:mt-5  pl-2 max-sm:text-sm ">
                     {date.toLocaleString("en-IN", options)}
                   </h1>
                 </div>
@@ -376,12 +391,26 @@ const deleteFn = async() => {
               </div>
             </div>
             <h1
-              className={`flex ${
-                up ? " justify-end mr-20 " : null
-              } text-slate-400 text-sm`}
+              className={`${up?" flex justify-end ":" "}`}
             >
-              {message}
+             <h1 className={`flex ${
+                up ? " justify-end  " : null
+              } text-slate-400 text-sm font-product 
+              ${up && messages.is_edit?" mr-5":" mr-20 "}
+              `}
+              
+              >
+             {message}
+             </h1>
+              {
+            up && messages.is_edit?
+              <h1 className={`flex cursor-default ${
+                
+                " justify-end " 
+             } text-[#18ffff]  text-sm font-product `}>Isedited</h1>:null
+          }
             </h1>
+         
           </div>
           <Modal open={open} onClose={() => setOpen(false)}>
             <div className="text-center w-56 font-product ">

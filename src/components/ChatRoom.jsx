@@ -43,6 +43,34 @@ function ChatRoom({ user }) {
   // console.log(rooms);
   
     fetchRooms();
+    const channel = supabase
+    .channel('rooms')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'rooms',
+    }, (payload) => {
+      console.log("Real-time change:", payload);
+      if (payload.eventType === 'INSERT') {
+        setRooms((prevRooms) => [...prevRooms, payload.new]);
+      } else if (payload.eventType === 'UPDATE') {
+        setRooms((prevRooms) =>
+          prevRooms.map((room) =>
+            room.id === payload.new.id ? payload.new : room
+          )
+        );
+      } else if (payload.eventType === 'DELETE') {
+        setRooms((prevRooms) =>
+          prevRooms.filter((room) => room.id !== payload.old.id)
+        );
+      }
+    })
+    .subscribe();
+
+ 
+  return () => {
+    channel.unsubscribe(); 
+  };
   }, []);
   // console.log(rooms);
   
@@ -163,7 +191,7 @@ function ChatRoom({ user }) {
         delete updatedStatus[userData.username];
         return updatedStatus;
       });
-    }, 2000);
+    }, 1000);
   };
 const handleCreateRoom = async () => {
   const roomName = prompt("Enter room name");

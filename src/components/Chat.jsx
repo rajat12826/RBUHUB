@@ -41,8 +41,37 @@ function Chat({ user }) {
   // console.log(rooms);
   
     fetchRooms();
+    const channel = supabase
+    .channel('rooms')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'rooms',
+    }, (payload) => {
+      console.log("Real-time change:", payload);
+      if (payload.eventType === 'INSERT') {
+        setRooms((prevRooms) => [...prevRooms, payload.new]);
+      } else if (payload.eventType === 'UPDATE') {
+        setRooms((prevRooms) =>
+          prevRooms.map((room) =>
+            room.id === payload.new.id ? payload.new : room
+          )
+        );
+      } else if (payload.eventType === 'DELETE') {
+        setRooms((prevRooms) =>
+          prevRooms.filter((room) => room.id !== payload.old.id)
+        );
+      }
+    })
+    .subscribe();
+
+ 
+  return () => {
+    channel.unsubscribe(); 
+  };
+    
   }, []);
-  // console.log(rooms);
+
   
   useEffect(() => {
     const fetchUserData = async () => {
@@ -209,7 +238,7 @@ function Chat({ user }) {
         delete updatedStatus[userData.username];
         return updatedStatus;
       });
-    }, 2000);
+    }, 1000);
   };
 const handleCreateRoom = async () => {
   const roomName = prompt("Enter room name");
@@ -319,7 +348,12 @@ const handleJoinRoom = async (roomId) => {
   return (
     <>
       {!loading ? (
-        <div className="bg-[#100f18] h-full flex  flex-col">
+        <div className="bg-[#100f18] h-full flex  flex-col"  onKeyDown={(e) => {
+          if (e.ctrlKey && (e.key === 'p')) {
+         console.log("enedj");
+         
+          }
+        }}>
           <div className="flex-grow overflow-auto">
             <nav className="flex justify-between p-4 font-product">
               <div className="text-red-50 ">
@@ -359,32 +393,35 @@ const handleJoinRoom = async (roomId) => {
                 </div>
               </div>
               <Menu>
-                <MenuHandler className="mr-24">
+                <MenuHandler className="mr-24 ">
                   <button className="text-slate-200 font-semibold hover:text-slate-400 mr-5">
-                   <h1 className="text-slate-400"> Rooms</h1>
+                   <h1 className="text-slate-400 "> Rooms</h1>
                   </button>
                 </MenuHandler>
-                <MenuList className="ml-10 bg-gray-900 shadow-md shadow-[#03a9f4] border-[#03a9f4] border-2">
+                <MenuList className="ml-10 bg-gray-900 shadow-md shadow-[#03a9f4] border-[#03a9f4] border-2 font-product">
                   <MenuItem
                     
-                    className=" flex  items-center justify-center hover:bg-text-800 font-semibold "
+                    className=" flex  items-center justify-center hover:bg-text-800  "
                   >
-                  <button className=" text-slate-300  hover:text-slate-500 mr-5"   onClick={handleCreateRoom}><h1 className="font-bold font-product" >  Create A Room</h1></button>
+                  <button className=" text-slate-300 font-semibold hover:text-slate-500 mr-5"   onClick={handleCreateRoom}><h1 className="font-semibold  "> Create A Room</h1></button>
                   </MenuItem>
                       <MenuItem
                     
                     className=" flex  items-center justify-center hover:bg-text-800 "
                   >
-                  <button className=" text-slate-300 font-semibold hover:text-slate-500 mr-5"><h1 className="font-bold font-product " onClick={ handleJoinRoom}> Join A Rooms:</h1></button>
+                  <button className=" text-slate-300 font-semibold hover:text-slate-500 mr-5"><h1 className="font-semibold " onClick={ handleJoinRoom}> Join  Rooms:</h1></button>
                   </MenuItem>
-                  {rooms.map((room)=>{
+                <div className="ml-20">
+                {rooms.map((room)=>{
                   return <MenuItem
-  className="flex items-center justify-center font-product font-semibold  text-gray-300 hover:bg-text-800"
+  className="flex items-center justify-center text-gray-300 hover:text-slate-500 hover:bg-text-800"
   onClick={() => handleJoinRoom(room.id)}
 >
   <h1 className="font-semibold">{room.name}</h1>
 </MenuItem>
                   })}
+                </div>
+                  
                 </MenuList>
               </Menu>
             </nav>

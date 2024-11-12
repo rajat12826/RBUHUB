@@ -66,7 +66,7 @@ const Home = ({ user, loading, setLoading }) => {
       {loading ? (
         <Demo />
       ) : user && localStorage.getItem("user") !== "null" ? (
-        <div className="page home">
+        <div className="page home ">
           {fetchError && <p className="text-red-500">{fetchError}</p>}
           {notes.length > 0 ? (
             <div className="flex flex-col">
@@ -80,13 +80,13 @@ const Home = ({ user, loading, setLoading }) => {
                 <div className="flex py-2">
                   <button
                     onClick={() => setOrderBy("created_at")}
-                    className="text-sm pl-2 hover:font-semibold hover:text-red-600 bg-red-500 py-1 text-white px-2 rounded-sm"
+                    className="text-sm pl-2 hover:font-semibold hover:text-[#ff1744] hover:bg-transparent hover:border-[#ff1744] hover:border-2 bg-[#ff1744] py-1 text-white px-2 rounded-sm"
                   >
                     Time Created
                   </button>
                   <button
                     onClick={() => setOrderBy("title")}
-                    className="text-sm pl-2 hover:font-semibold hover:text-green-700 bg-green-500 ml-2 py-1 text-white px-2 rounded-sm"
+                    className="text-sm pl-2 hover:font-semibold hover:text-[#0091ea] hover:bg-transparent bg-[#0091ea]  hover:border-2  hover:border-[#0091ea] ml-2 py-1 text-white px-2 rounded-sm"
                   >
                     Subject
                   </button>

@@ -47,7 +47,7 @@ const NotesCard = ({ note, onDelete }) => {
           <div>
             <Link to={`/${note.id}`}>
               {" "}
-              <button className="w-16 max-sm:mb-1 ml-2 hover:border-2 text-white bg-green-500 px-2 rounded-sm font-normal text-sm  py-2 hover:text-green-500 hover:font-bold hover:bg-transparent ">
+              <button className="w-16 max-sm:mb-1 ml-2 hover:border-2 text-white bg-[#2962ff]  rounded-sm font-normal text-sm  py-2 hover:text-[#2962ff] hover:border-[#2962ff] hover:border-2 hover:font-bold hover:bg-transparent ">
                 Update
               </button>
             </Link>
