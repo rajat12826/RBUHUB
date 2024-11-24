@@ -65,17 +65,18 @@ window.location.reload();
     }
 
     if (data) {
-      console.log("data", data);
+      // console.log("data", data);
 
       toast.success("Sign-in successful!");
 
-      console.log(data.user.id);
+      // console.log(data.user.id);
       const { data: data1, error: error1 } = await supabase
         .from("User")
-        .select("*")
-        .eq("user_id", data.user.id);
+        .update({isActive:true})
+        .eq("user_id", data.user.id)
+        .select("*");
 
-      console.log(error1, data1[0].avatar);
+      // console.log(error1, data1[0].avatar);
 
       
       // const { error: onlineUserError } = await supabase
@@ -101,7 +102,7 @@ window.location.reload();
       // else {
         toast.success("Sign-in successful!");
       // }
-      console.log(JSON.stringify(data));
+      // console.log(JSON.stringify(data));
       localStorage.setItem("user", JSON.stringify(data));
       setTimeout(() => {
         navigate("/");
@@ -211,7 +212,7 @@ window.location.reload();
                     Forgot password
                   </Typography>
                 </div>
-                <Button
+                {/* <Button
                   variant="outlined"
                   size="lg"
                   className="mt-6 flex h-12 items-center justify-center gap-2 cursor-not-allowed "
@@ -223,7 +224,7 @@ window.location.reload();
                     className="h-6 w-6"
                   />{" "}
                   <h1 className="font-semibold" onClick={handleGoogle}> Sign In With Google</h1>
-                </Button>
+                </Button> */}
                 <Typography
                   variant="small"
                   color="gray"

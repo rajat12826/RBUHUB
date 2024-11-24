@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import supabase from "../config/supabaseClients";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
-function Navbar() {
+function Navbar({mainu}) {
   const navigate = useNavigate();
   useEffect(() => {
     setTimeout(async () => {
@@ -12,12 +12,17 @@ function Navbar() {
       navigate("/");
     }, 4 * 60 * 60 * 1000);
   });
+  console.log(mainu);
+  
   const logOut = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user ? user.user.id : null;
     let { error } = await supabase.auth.signOut();
     console.log(error);
-
+    const { data: data1, error: error1 } = await supabase
+    .from("User")
+    .update({isActive:false})
+    .eq("user_id", userId);
     if (!error) {
       toast.success("Successfully Log Out!!");
       // navigate('/login')
@@ -47,17 +52,27 @@ function Navbar() {
                 Home
               </Link>
               <Link
-                to="/create"
-                className="hover:font-semibold hover:text-green-500"
-              >
-                Create New Note
-              </Link>
-              <Link
                 to="/chat"
                 className="hover:font-semibold hover:text-green-500"
               >
                 Chats
               </Link>
+              <Link
+                to="/create"
+                className="hover:font-semibold hover:text-green-500"
+              >
+                Create New Note
+              </Link>
+              
+              {
+                (mainu && mainu[0].read)?
+                <Link
+                to="/users"
+                className="hover:font-semibold hover:text-green-500"
+              >
+              RBAC
+              </Link>:null
+              }
               <button className="text-white font-semibold" onClick={logOut}>
                 LogOut{" "}
               </button>

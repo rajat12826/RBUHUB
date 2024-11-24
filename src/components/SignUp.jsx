@@ -37,14 +37,14 @@ function SignUp() {
 
     // Usage:
     const avatar = generateAvatarUrl(email);
-    console.log(avatar);
+    // console.log(avatar);
 
     try {
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
       });
-      console.log(error, data);
+      // console.log(error, data);
       // if (error) throw error;
       // console.log("u", data.user.id);
 
@@ -72,7 +72,13 @@ function SignUp() {
         // setLoading(false);
         setloading(false);
         setTimeout(() => {
-          navigate("/login");
+          const redirectToHome = () => {
+            const link = document.createElement('a');
+            link.href = '/';
+            link.click(); 
+          };
+          redirectToHome()
+          navigate('/')
         }, 500);
         setTimeout(() => {
           window.location.reload();
